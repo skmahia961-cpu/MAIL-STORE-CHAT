@@ -11,71 +11,25 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-primary: #121212;
-            --bg-secondary: #1E1E1E;
-            --bg-tertiary: #2C2C2C;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --text-primary: #FFFFFF;
-            --text-secondary: #A0A0A0;
-            --accent-start: #87CEEB;
-            --accent-end: #4682B4;
+            --bg-primary: #121212; --bg-secondary: #1E1E1E; --bg-tertiary: #2C2C2C;
+            --border-color: rgba(255, 255, 255, 0.1); --text-primary: #FFFFFF; --text-secondary: #A0A0A0;
+            --accent-start: #87CEEB; --accent-end: #4682B4;
         }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-primary); 
-            color: var(--text-primary);
-            background-image: radial-gradient(circle at top left, rgba(80, 80, 255, 0.08), transparent 40%);
-            background-attachment: fixed;
-            overscroll-behavior: none;
-        }
-        .main-page { display: none; }
-        .main-page.active { display: flex; }
-        .card-bg { 
-            background-color: rgba(30, 30, 30, 0.7); 
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(10px);
-        }
-        .text-accent-gradient {
-            background: linear-gradient(to right, var(--accent-start), var(--accent-end));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .btn-gradient { 
-            background-image: linear-gradient(to right, var(--accent-end), #5A9BD5);
-            color: var(--text-primary); 
-            font-weight: bold; 
-            box-shadow: 0 4px 15px rgba(70, 130, 180, 0.2);
-            transition: all 0.2s ease-in-out;
-        }
-        .btn-gradient:hover { box-shadow: 0 6px 20px rgba(70, 130, 180, 0.3); }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); overscroll-behavior: none; }
+        .main-page { display: none; } .main-page.active { display: flex; }
+        .card-bg { background-color: rgba(30, 30, 30, 0.7); border: 1px solid var(--border-color); backdrop-filter: blur(10px); }
+        .text-accent-gradient { background: linear-gradient(to right, var(--accent-start), var(--accent-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn-gradient { background-image: linear-gradient(to right, var(--accent-end), #5A9BD5); color: var(--text-primary); font-weight: bold; transition: all 0.2s; }
         .btn-gradient:active { transform: scale(0.96); }
-        .input-field { 
-            background-color: var(--bg-tertiary); 
-            border: 1px solid #444;
-            transition: all 0.2s ease-in-out;
-        }
-        .input-field:focus {
-            border-color: var(--accent-end);
-            box-shadow: 0 0 0 3px rgba(70, 130, 180, 0.3);
-            outline: none;
-        }
-        .header {
-             border-bottom: 1px solid var(--border-color);
-             background-color: rgba(18, 18, 18, 0.8);
-             backdrop-filter: blur(10px);
-        }
+        .input-field { background-color: var(--bg-tertiary); border: 1px solid #444; transition: all 0.2s; }
+        .input-field:focus { border-color: var(--accent-end); box-shadow: 0 0 0 3px rgba(70, 130, 180, 0.3); outline: none; }
+        .header { border-bottom: 1px solid var(--border-color); background-color: rgba(18, 18, 18, 0.8); backdrop-filter: blur(10px); }
         .chat-bubble { max-width: 80%; padding: 10px 15px; border-radius: 20px; word-wrap: break-word; line-height: 1.4; }
         .chat-bubble-incoming { background-color: #262626; border-bottom-left-radius: 5px; align-self: flex-start; }
         .chat-bubble-outgoing { background-color: var(--accent-end); color: var(--text-primary); border-bottom-right-radius: 5px; align-self: flex-end; }
         .admin-user-item.active { background-color: rgba(70, 130, 180, 0.2); border-right: 3px solid var(--accent-end); }
-        .avatar { display: inline-flex; align-items-center; justify-content: center; font-weight: bold; color: white; border-radius: 50%; }
-        .profile-pic-container { position: relative; cursor: pointer; }
-        .profile-pic-overlay {
-            position: absolute; inset: 0; background-color: rgba(0,0,0,0.5); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.2s ease-in-out;
-        }
-        .profile-pic-container:hover .profile-pic-overlay { opacity: 1; }
+        .avatar { display: inline-flex; align-items: center; justify-content: center; font-weight: bold; color: white; border-radius: 50%; }
+        .unread-badge { background-color: #ef4444; color: white; font-size: 0.75rem; font-weight: bold; padding: 2px 6px; border-radius: 9999px; }
     </style>
 </head>
 <body class="max-w-md mx-auto h-screen overflow-hidden">
@@ -85,16 +39,11 @@
     </div>
 
     <div id="app-container" class="h-full flex-col main-page">
+        <!-- User Chat View -->
         <div id="user-chat-view" class="h-full flex-col hidden w-full">
             <header class="header flex items-center justify-between p-4 flex-shrink-0">
                 <div class="flex items-center gap-3">
-                    <div id="user-profile-pic-wrapper" class="profile-pic-container">
-                        <img id="user-profile-pic" src="" class="w-10 h-10 rounded-full object-cover bg-bg-tertiary">
-                        <div class="profile-pic-overlay">
-                            <i data-lucide="camera" class="w-5 h-5 text-white"></i>
-                        </div>
-                    </div>
-                    <input type="file" id="profile-pic-input" class="hidden" accept="image/*">
+                    <img id="user-profile-pic" src="" class="w-10 h-10 rounded-full object-cover bg-bg-tertiary">
                     <div>
                         <h1 class="text-xl font-bold text-accent-gradient inline">Support</h1>
                         <span id="admin-status" class="ml-2 text-sm font-medium"></span>
@@ -104,23 +53,16 @@
             <main id="chat-messages" class="flex-grow p-4 flex flex-col space-y-4 overflow-y-auto"></main>
             <footer class="p-4 card-bg border-t border-gray-700/50 flex-shrink-0">
                 <div class="flex items-center space-x-2">
-                    <input type="file" id="user-file-input" class="hidden" accept="image/*,.pdf,.doc,.docx">
-                    <button id="user-attach-btn" class="p-3 rounded-full hover:bg-gray-600/50 transition-colors">
-                        <i data-lucide="paperclip" class="w-6 h-6"></i>
-                    </button>
                     <input id="user-message-input" type="text" placeholder="Type your message..." class="flex-grow w-full p-3 rounded-full input-field">
-                    <button id="user-send-btn" class="btn-gradient p-3 rounded-full flex-shrink-0">
-                        <i data-lucide="send" class="w-6 h-6"></i>
-                    </button>
+                    <button id="user-send-btn" class="btn-gradient p-3 rounded-full flex-shrink-0"><i data-lucide="send" class="w-6 h-6"></i></button>
                 </div>
             </footer>
         </div>
 
+        <!-- Admin Panel View -->
         <div id="admin-panel-view" class="h-full flex hidden w-full bg-bg-secondary">
-            <div id="admin-user-list-container" class="w-2/5 border-r border-border-color flex flex-col h-full">
-                <header class="header p-4 flex-shrink-0 flex items-center justify-between">
-                    <h2 class="font-bold text-lg">Chats</h2>
-                </header>
+            <div class="w-2/5 border-r border-border-color flex flex-col h-full">
+                <header class="header p-4 flex-shrink-0"><h2 class="font-bold text-lg">Chats</h2></header>
                 <div id="admin-user-list" class="overflow-y-auto flex-grow"></div>
                 <button id="logout-btn-admin" class="w-full p-3 text-red-400 hover:bg-red-500/10 border-t border-border-color flex items-center justify-center gap-2">
                     <i data-lucide="log-out" class="w-5 h-5"></i><span>Logout</span>
@@ -129,8 +71,7 @@
             <div id="admin-chat-window" class="w-3/5 flex flex-col h-full">
                 <div id="admin-chat-placeholder" class="flex flex-col h-full items-center justify-center text-gray-500 text-center p-4">
                     <i data-lucide="messages-square" class="w-24 h-24 mb-4 text-gray-600"></i>
-                    <h3 class="text-lg font-semibold">Welcome, Admin</h3>
-                    <p>Select a conversation to start chatting.</p>
+                    <h3 class="text-lg font-semibold">Welcome, Admin</h3><p>Select a conversation to start.</p>
                 </div>
                 <div id="admin-chat-area" class="h-full flex-col hidden">
                     <header class="header flex items-center p-4 flex-shrink-0 gap-3">
@@ -153,18 +94,17 @@
         // =================================================================================
         // ধাপ ১: আপনার তথ্য এখানে কনফিগার করুন
         // =================================================================================
-        const ADMIN_TELEGRAM_ID = "6954647230"; // আপনার অ্যাডমিনের টেলিগ্রাম আইডি (string হিসাবে) এখানে দিন
-        const GET_CUSTOM_TOKEN_URL = "6415093983"; // আপনার ক্লাউড ফাংশনের URL এখানে দিন
+        const ADMIN_TELEGRAM_ID = "7358825471"; // আপনার অ্যাডমিন টেলিগ্রাম আইডি এখানে দেওয়া হয়েছে
+        const GET_CUSTOM_TOKEN_URL = "YOUR_CLOUD_FUNCTION_URL_HERE"; // আপনার ক্লাউড ফাংশনের URL এখানে দিন
 
         const firebaseConfig = {
-            // আপনার Firebase কনফিগারেশন এখানে পেস্ট করুন
-            apiKey: "AIzaSyApc8_tOZSoOvIISX65kc-wr2RrV3nEgJE",
-            authDomain: "admin-1feb9.firebaseapp.com",
-            databaseURL: "https://admin-1feb9-default-rtdb.firebaseio.com",
-            projectId: "admin-1feb9",
-            storageBucket: "admin-1feb9.firebasestorage.app",
-            messagingSenderId: "752502188369",
-            appId: "1:752502188369:web:3346f5659c5fcf32178b70"
+            // আপনার Firebase প্রজেক্টের কনফিগারেশন এখানে পেস্ট করুন
+            apiKey: "AIza...",
+            authDomain: "...",
+            projectId: "...",
+            storageBucket: "...",
+            messagingSenderId: "...",
+            appId: "..."
         };
         
         // =================================================================================
@@ -172,16 +112,14 @@
         // =================================================================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, serverTimestamp, query, orderBy, onSnapshot, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
-
+        import { getFirestore, doc, setDoc, getDoc, collection, serverTimestamp, query, orderBy, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = getStorage(app);
 
         let currentUser = null, userData = null, activeChatListener = null, selectedUserId = null;
-        let adminStatusListener = null, isAdminOnline = false, adminHeartbeatInterval = null;
+        let adminStatusListener = null, adminHeartbeatInterval = null;
         let telegramUser = null;
         
         const loader = document.getElementById('loader');
@@ -190,19 +128,16 @@
         window.onload = () => {
             lucide.createIcons();
             setupEventListeners();
-            
             try {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
-                
-                if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+                if (Telegram.WebApp.initDataUnsafe?.user) {
                     telegramUser = Telegram.WebApp.initDataUnsafe.user;
                     onAuthStateChanged(auth, handleAuthStateChange);
                 } else {
-                    handleAuthError("Could not retrieve user data from Telegram.");
+                    handleAuthError("Could not get user data from Telegram.");
                 }
             } catch (e) {
-                console.error("Telegram WebApp script error:", e);
                 handleAuthError("Please open this app inside Telegram.");
             }
         };
@@ -216,7 +151,6 @@
                 currentUser = user;
                 await fetchUserData();
                 showMainPage('app-container');
-
                 if (user.uid === ADMIN_TELEGRAM_ID) {
                     initializeAppAdmin();
                 } else {
@@ -229,7 +163,7 @@
 
         async function authenticateWithTelegram() {
             try {
-                if (GET_CUSTOM_TOKEN_URL === "YOUR_CLOUD_FUNCTION_URL_HERE") {
+                if (!GET_CUSTOM_TOKEN_URL || GET_CUSTOM_TOKEN_URL === "YOUR_CLOUD_FUNCTION_URL_HERE") {
                    return handleAuthError("Backend function URL is not configured.");
                 }
                 const response = await fetch(GET_CUSTOM_TOKEN_URL, {
@@ -238,16 +172,13 @@
                     body: JSON.stringify({ initData: Telegram.WebApp.initData })
                 });
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Failed to get custom token: ${errorText}`);
-                }
+                if (!response.ok) throw new Error(`Token request failed: ${await response.text()}`);
                 
                 const result = await response.json();
                 await signInWithCustomToken(auth, result.token);
             } catch (error) {
-                console.error("Custom authentication failed:", error);
-                handleAuthError("Authentication failed. Please try reloading the app.");
+                console.error("Custom auth failed:", error);
+                handleAuthError("Authentication failed. Please reload.");
             }
         }
 
@@ -258,7 +189,7 @@
 
             if (!userSnap.exists()) {
                 const name = `${telegramUser.first_name || ''} ${telegramUser.last_name || ''}`.trim() || telegramUser.username || `User-${telegramUser.id}`;
-                const defaultData = { name: name, telegramId: telegramUser.id, username: telegramUser.username, photoURL: null };
+                const defaultData = { name, telegramId: telegramUser.id, username: telegramUser.username };
                 await setDoc(userRef, defaultData); 
                 userData = defaultData;
             } else { 
@@ -270,8 +201,8 @@
         function updateUserProfileUI() {
             if (!userData) return;
             const profilePicEl = document.getElementById('user-profile-pic');
-            const nameToUse = userData.name || (telegramUser ? telegramUser.first_name : 'U');
-            profilePicEl.src = userData.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(nameToUse.charAt(0))}&background=random&color=fff`;
+            const nameToUse = userData.name || 'U';
+            profilePicEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nameToUse.charAt(0))}&background=random&color=fff`;
         }
         
         function initializeAppUser() {
@@ -284,29 +215,17 @@
         }
 
         function listenForAdminStatus() {
-            if (!ADMIN_TELEGRAM_ID) return;
-            if (adminStatusListener) adminStatusListener();
-            
             const statusRef = doc(db, 'admin_status', ADMIN_TELEGRAM_ID);
             const statusEl = document.getElementById('admin-status');
-            statusEl.innerHTML = '<span class="text-yellow-500">●</span> Connecting...';
-
             adminStatusListener = onSnapshot(statusRef, (docSnap) => {
                 if (docSnap.exists() && docSnap.data().lastSeen) {
-                    const lastSeen = docSnap.data().lastSeen.toDate();
-                    const diffMinutes = (new Date() - lastSeen) / (1000 * 60);
-                    isAdminOnline = diffMinutes < 2;
-                    statusEl.innerHTML = isAdminOnline 
+                    const diffMinutes = (new Date() - docSnap.data().lastSeen.toDate()) / 60000;
+                    statusEl.innerHTML = diffMinutes < 2 
                         ? '<span class="text-green-400">●</span> Online' 
                         : '<span class="text-gray-500">●</span> Offline';
                 } else {
-                    isAdminOnline = false;
                     statusEl.innerHTML = '<span class="text-gray-500">●</span> Offline';
                 }
-            }, (error) => {
-                console.error("Error listening to admin status:", error);
-                isAdminOnline = false;
-                statusEl.innerHTML = '<span class="text-red-500">●</span> Status Error';
             });
         }
 
@@ -331,10 +250,7 @@
         }
 
         function setupAdminHeartbeat() {
-            if (adminHeartbeatInterval) clearInterval(adminHeartbeatInterval);
-            const statusRef = doc(db, 'admin_status', ADMIN_TELEGRAM_ID);
-            const updateStatus = () => setDoc(statusRef, { lastSeen: serverTimestamp() });
-            
+            const updateStatus = () => setDoc(doc(db, 'admin_status', ADMIN_TELEGRAM_ID), { lastSeen: serverTimestamp() });
             updateStatus();
             adminHeartbeatInterval = setInterval(updateStatus, 60 * 1000);
         }
@@ -343,7 +259,7 @@
             const container = document.getElementById('admin-user-list');
             const q = query(collection(db, 'support_chats'), orderBy('lastUpdate', 'desc'));
             onSnapshot(q, (snap) => {
-                container.innerHTML = snap.empty ? '<p class="p-4 text-gray-500 text-sm">No active chats.</p>' : '';
+                container.innerHTML = snap.empty ? '<p class="p-4 text-gray-500">No active chats.</p>' : '';
                 snap.forEach(docSnap => {
                     const chat = docSnap.data();
                     const el = document.createElement('div');
@@ -351,45 +267,42 @@
                     const initial = (chat.userName || 'G').charAt(0).toUpperCase();
                     const color = colorPalette[initial.charCodeAt(0) % colorPalette.length];
                     
-                    const avatarContent = chat.userPhotoURL 
-                        ? `<img src="${chat.userPhotoURL}" class="w-10 h-10 rounded-full object-cover">`
-                        : `<div class="avatar w-10 h-10 text-lg" style="background-color: ${color}">${initial}</div>`;
-                    
+                    // নতুন পরিবর্তন: Unread count badge যোগ করা হয়েছে
+                    const unreadBadge = chat.unreadCount_admin > 0 ? `<span class="unread-badge">${chat.unreadCount_admin}</span>` : '';
+
                     el.innerHTML = `
-                        ${avatarContent}
+                        <div class="avatar w-10 h-10 text-lg" style="background-color: ${color}">${initial}</div>
                         <div class="flex-grow overflow-hidden">
                             <p class="font-bold truncate">${chat.userName || 'Guest'}</p>
                             <p class="text-sm text-text-secondary truncate">${chat.lastMessage || '...'}</p>
-                        </div>`;
-                    el.onclick = () => {
-                        document.querySelectorAll('.admin-user-item').forEach(d => d.classList.remove('active'));
-                        el.classList.add('active');
-                        loadAdminChatForUser(docSnap.id, chat);
-                    };
+                        </div>
+                        ${unreadBadge}`;
+                    el.onclick = () => loadAdminChatForUser(docSnap.id, chat);
                     container.appendChild(el);
                 });
             });
         }
         
-        function loadAdminChatForUser(userId, chatData) {
+        async function loadAdminChatForUser(userId, chatData) {
+            document.querySelectorAll('.admin-user-item').forEach(d => d.classList.remove('active'));
+            document.querySelector(`.admin-user-item[onclick*="'${userId}'"]`)?.classList.add('active');
+            
             selectedUserId = userId;
             document.getElementById('admin-chat-placeholder').style.display = 'none';
             const chatArea = document.getElementById('admin-chat-area');
             chatArea.classList.remove('hidden'); chatArea.classList.add('flex');
             
             document.getElementById('admin-chat-header').textContent = chatData.userName || 'Guest';
-            const picContainer = document.getElementById('admin-chat-header-pic');
-            if (chatData.userPhotoURL) {
-                picContainer.innerHTML = `<img src="${chatData.userPhotoURL}" class="w-10 h-10 rounded-full object-cover">`;
-            } else {
-                const initial = (chatData.userName || 'G').charAt(0).toUpperCase();
-                const color = colorPalette[initial.charCodeAt(0) % colorPalette.length];
-                picContainer.innerHTML = `<div class="avatar w-10 h-10 text-lg" style="background-color: ${color}">${initial}</div>`;
+            const initial = (chatData.userName || 'G').charAt(0).toUpperCase();
+            const color = colorPalette[initial.charCodeAt(0) % colorPalette.length];
+            document.getElementById('admin-chat-header-pic').innerHTML = `<div class="avatar w-10 h-10 text-lg" style="background-color: ${color}">${initial}</div>`;
+            
+            // নতুন পরিবর্তন: চ্যাট খুললে unread count রিসেট করা
+            if (chatData.unreadCount_admin > 0) {
+                await updateDoc(doc(db, 'support_chats', userId), { unreadCount_admin: 0 });
             }
 
             const container = document.getElementById('admin-chat-messages');
-            container.innerHTML = '';
-            
             const q = query(collection(db, `support_chats/${userId}/messages`), orderBy("timestamp"));
             if (activeChatListener) activeChatListener();
             activeChatListener = onSnapshot(q, (snap) => {
@@ -399,62 +312,23 @@
             });
         }
 
-        async function handleProfilePictureUpload(file) {
-            if (!file || !currentUser) return;
-            loader.style.display = 'flex';
-            try {
-                const storageRef = ref(storage, `profile_pictures/${currentUser.uid}`);
-                await uploadBytes(storageRef, file);
-                const downloadURL = await getDownloadURL(storageRef);
-
-                await updateDoc(doc(db, "users", currentUser.uid), { photoURL: downloadURL });
-                await setDoc(doc(db, "support_chats", currentUser.uid), { userPhotoURL: downloadURL }, { merge: true });
-
-                userData.photoURL = downloadURL;
-                updateUserProfileUI();
-            } catch (error) {
-                console.error("Profile picture upload error:", error);
-                alert("Failed to upload profile picture.");
-            } finally {
-                loader.style.display = 'none';
-            }
-        }
-        
-        async function handleFileUpload(file) {
-            if (!file || !currentUser) return;
-            loader.style.display = 'flex';
-            try {
-                const storageRef = ref(storage, `support_files/${currentUser.uid}/${Date.now()}_${file.name}`);
-                await uploadBytes(storageRef, file);
-                const downloadURL = await getDownloadURL(storageRef);
-                await sendMessage({ fileURL: downloadURL, fileName: file.name, fileType: file.type }, true);
-            } catch (error) { 
-                console.error("Upload Error:", error); 
-                alert("File upload failed. Please check Storage Rules in Firebase."); 
-            } finally { 
-                loader.style.display = 'none'; 
-            }
-        }
-
-        async function sendMessage(payload, fromUser) {
-            const { text = '', fileURL = null, fileName = null, fileType = null } = payload;
-            if (!text.trim() && !fileURL) return;
+        async function sendMessage(text, fromUser) {
+            if (!text.trim()) return;
             const chatUID = fromUser ? currentUser.uid : selectedUserId;
             if (!chatUID) return;
 
             const messageData = { senderId: currentUser.uid, text, timestamp: serverTimestamp() };
-            if (fileURL) Object.assign(messageData, { fileURL, fileName, fileType });
-            
             await addDoc(collection(db, `support_chats/${chatUID}/messages`), messageData);
-            const lastMessageText = fileName ? `📄 ${fileName}` : text;
             
-            let chatMetadata = {
-                lastMessage: lastMessageText,
+            const chatMetadata = {
+                lastMessage: text,
                 lastUpdate: serverTimestamp()
             };
+
             if (fromUser) {
                 chatMetadata.userName = userData.name;
-                chatMetadata.userPhotoURL = userData.photoURL || null;
+                // নতুন পরিবর্তন: ব্যবহারকারী মেসেজ পাঠালে unread count বাড়ানো
+                chatMetadata.unreadCount_admin = increment(1);
             }
             
             await setDoc(doc(db, 'support_chats', chatUID), chatMetadata, { merge: true });
@@ -465,23 +339,10 @@
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${isOutgoing ? 'chat-bubble-outgoing' : 'chat-bubble-incoming'}`;
             
-            if (msg.fileURL) {
-                let fileEl;
-                if (msg.fileType?.startsWith('image/')) {
-                    fileEl = `<img src="${msg.fileURL}" alt="${msg.fileName}" class="rounded-lg max-w-full h-auto my-2 cursor-pointer" onclick="window.open('${msg.fileURL}', '_blank')">`;
-                } else {
-                    fileEl = `<a href="${msg.fileURL}" target="_blank" download="${msg.fileName}" class="flex items-center gap-2 p-2 rounded-lg my-2 ${isOutgoing ? 'hover:bg-white/20' : 'hover:bg-black/20'}">
-                        <i data-lucide="file" class="w-6 h-6 shrink-0"></i><span class="font-medium truncate">${msg.fileName}</span></a>`;
-                }
-                bubble.innerHTML += fileEl;
-            }
-
-            if (msg.text) bubble.innerHTML += `<p>${msg.text.replace(/\n/g, '<br>')}</p>`;
-
-            if (msg.timestamp) {
-                const time = msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                bubble.innerHTML += `<p class="text-xs mt-1 text-right ${isOutgoing ? 'text-gray-200' : 'text-text-secondary'}">${time}</p>`;
-            }
+            bubble.innerHTML = `<p>${msg.text.replace(/\n/g, '<br>')}</p>
+                <p class="text-xs mt-1 text-right ${isOutgoing ? 'text-gray-200' : 'text-text-secondary'}">
+                    ${msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                </p>`;
             container.appendChild(bubble);
             lucide.createIcons();
         }
@@ -489,60 +350,21 @@
         function setupEventListeners() {
             document.getElementById('logout-btn-admin').addEventListener('click', () => signOut(auth));
             
-            document.getElementById('user-profile-pic-wrapper').addEventListener('click', () => document.getElementById('profile-pic-input').click());
-            document.getElementById('profile-pic-input').addEventListener('change', (e) => {
-                if(e.target.files[0]) handleProfilePictureUpload(e.target.files[0]);
-                e.target.value = null;
-            });
-
-            const userInp = document.getElementById('user-message-input'), userSendBtn = document.getElementById('user-send-btn');
-            
-            const userSend = async () => {
-                const text = userInp.value.trim();
-                if(!text) return;
-                userInp.value = '';
-                await sendMessage({ text: text }, true);
-                
-                if (!isAdminOnline && ADMIN_TELEGRAM_ID) {
-                    const chatRef = doc(db, 'support_chats', currentUser.uid);
-                    try {
-                        await runTransaction(db, async (transaction) => {
-                            const chatDoc = await transaction.get(chatRef);
-                            if (!chatDoc.exists() || !chatDoc.data().autoReplySent) {
-                                const OFFLINE_MESSAGE_TEXT = "এখন আমাদের প্রতিনিধি অফলাইনে আছেন। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।";
-                                const autoReplyData = { senderId: ADMIN_TELEGRAM_ID, text: OFFLINE_MESSAGE_TEXT, timestamp: serverTimestamp() };
-                                
-                                const newMsgRef = doc(collection(db, `support_chats/${currentUser.uid}/messages`));
-                                transaction.set(newMsgRef, autoReplyData);
-                                transaction.set(chatRef, { autoReplySent: true }, { merge: true });
-                            }
-                        });
-                    } catch (e) { console.error("Auto-reply transaction failed: ", e); }
-                }
-            };
-            userSendBtn.addEventListener('click', userSend);
+            const userInp = document.getElementById('user-message-input');
+            const userSend = () => { sendMessage(userInp.value, true); userInp.value = ''; };
+            document.getElementById('user-send-btn').addEventListener('click', userSend);
             userInp.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); userSend(); } });
-            document.getElementById('user-attach-btn').addEventListener('click', () => document.getElementById('user-file-input').click());
-            document.getElementById('user-file-input').addEventListener('change', (e) => { if(e.target.files[0]) handleFileUpload(e.target.files[0]); e.target.value = null; });
 
-            const adminInp = document.getElementById('admin-message-input'), adminSendBtn = document.getElementById('admin-send-btn');
-            const adminSend = async () => {
-                const text = adminInp.value.trim();
-                if(!text || !selectedUserId) return;
-                adminInp.value = '';
-                await sendMessage({ text: text }, false);
-                const chatRef = doc(db, 'support_chats', selectedUserId);
-                await setDoc(chatRef, { autoReplySent: false }, { merge: true });
-            };
-            adminSendBtn.addEventListener('click', adminSend);
+            const adminInp = document.getElementById('admin-message-input');
+            const adminSend = () => { sendMessage(adminInp.value, false); adminInp.value = ''; };
+            document.getElementById('admin-send-btn').addEventListener('click', adminSend);
             adminInp.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); adminSend(); } });
         }
         
         function handleAuthError(message) {
             document.body.innerHTML = `<div class="flex flex-col items-center justify-center h-screen text-center p-4 text-red-400">
                 <i data-lucide="alert-triangle" class="w-16 h-16 mb-4"></i>
-                <h2 class="text-xl font-bold mb-2">Authentication Error</h2>
-                <p>${message}</p>
+                <h2 class="text-xl font-bold mb-2">Error</h2><p>${message}</p>
             </div>`;
             lucide.createIcons();
             loader.style.display = 'none';
