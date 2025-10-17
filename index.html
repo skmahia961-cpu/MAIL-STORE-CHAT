@@ -2,7 +2,7 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Support Chat 💬</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -26,6 +26,7 @@
             color: var(--text-primary);
             background-image: radial-gradient(circle at top left, rgba(80, 80, 255, 0.08), transparent 40%);
             background-attachment: fixed;
+            overscroll-behavior: none;
         }
         .main-page { display: none; }
         .main-page.active { display: flex; }
@@ -33,7 +34,6 @@
             background-color: rgba(30, 30, 30, 0.7); 
             border: 1px solid var(--border-color);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
         .text-accent-gradient {
             background: linear-gradient(to right, var(--accent-start), var(--accent-end));
@@ -49,15 +49,6 @@
         }
         .btn-gradient:hover { box-shadow: 0 6px 20px rgba(70, 130, 180, 0.3); }
         .btn-gradient:active { transform: scale(0.96); }
-        .btn-secondary {
-            background-color: var(--bg-tertiary);
-            color: var(--text-primary);
-            font-weight: bold;
-            border: 1px solid var(--border-color);
-            transition: all 0.2s ease-in-out;
-        }
-        .btn-secondary:hover { background-color: #3a3a3a; }
-        .btn-secondary:active { transform: scale(0.96); }
         .input-field { 
             background-color: var(--bg-tertiary); 
             border: 1px solid #444;
@@ -72,15 +63,12 @@
              border-bottom: 1px solid var(--border-color);
              background-color: rgba(18, 18, 18, 0.8);
              backdrop-filter: blur(10px);
-             -webkit-backdrop-filter: blur(10px);
         }
         .chat-bubble { max-width: 80%; padding: 10px 15px; border-radius: 20px; word-wrap: break-word; line-height: 1.4; }
         .chat-bubble-incoming { background-color: #262626; border-bottom-left-radius: 5px; align-self: flex-start; }
         .chat-bubble-outgoing { background-color: var(--accent-end); color: var(--text-primary); border-bottom-right-radius: 5px; align-self: flex-end; }
-        #chat-messages, #admin-chat-messages { scroll-behavior: smooth; }
-        .admin-user-item { transition: background-color 0.2s ease-in-out; }
         .admin-user-item.active { background-color: rgba(70, 130, 180, 0.2); border-right: 3px solid var(--accent-end); }
-        .avatar { display: inline-flex; align-items: center; justify-content: center; font-weight: bold; color: white; border-radius: 50%; }
+        .avatar { display: inline-flex; align-items-center; justify-content: center; font-weight: bold; color: white; border-radius: 50%; }
         .profile-pic-container { position: relative; cursor: pointer; }
         .profile-pic-overlay {
             position: absolute; inset: 0; background-color: rgba(0,0,0,0.5); border-radius: 50%;
@@ -92,32 +80,8 @@
 </head>
 <body class="max-w-md mx-auto h-screen overflow-hidden">
 
-    <div id="loader" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]" style="display: none;">
+    <div id="loader" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
         <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#4682B4]"></div>
-    </div>
-
-    <div id="auth-section" class="min-h-full p-4 flex-col justify-center items-center main-page">
-        <div class="w-full max-w-sm card-bg p-8 rounded-2xl">
-            <div class="text-center mb-6">
-                <i data-lucide="message-square-heart" class="w-16 h-16 text-[#87CEEB] mx-auto"></i>
-                <h1 class="text-3xl font-extrabold text-accent-gradient mt-4">Support Chat</h1>
-                <p class="text-gray-400 mt-1">Get started or log in as admin</p>
-            </div>
-            
-            <button id="guest-login-btn" class="w-full p-3 rounded-lg btn-secondary mb-4">Start Support Chat</button>
-
-            <div class="flex items-center my-4">
-                <hr class="flex-grow border-gray-600">
-                <span class="px-2 text-gray-500 text-sm">Admin</span>
-                <hr class="flex-grow border-gray-600">
-            </div>
-
-            <div id="auth-container">
-                <input id="login-email" type="email" placeholder="Admin Email" class="w-full p-3 rounded-lg input-field mb-4">
-                <input id="login-password" type="password" placeholder="Password" class="w-full p-3 rounded-lg input-field mb-4">
-                <button id="login-btn" class="w-full p-3 rounded-lg btn-gradient">Admin Login</button>
-            </div>
-        </div>
     </div>
 
     <div id="app-container" class="h-full flex-col main-page">
@@ -131,18 +95,16 @@
                         </div>
                     </div>
                     <input type="file" id="profile-pic-input" class="hidden" accept="image/*">
-
                     <div>
                         <h1 class="text-xl font-bold text-accent-gradient inline">Support</h1>
                         <span id="admin-status" class="ml-2 text-sm font-medium"></span>
                     </div>
                 </div>
-                <button id="logout-btn-user" class="text-red-400 hover:text-red-500"><i data-lucide="log-out" class="w-6 h-6"></i></button>
             </header>
             <main id="chat-messages" class="flex-grow p-4 flex flex-col space-y-4 overflow-y-auto"></main>
             <footer class="p-4 card-bg border-t border-gray-700/50 flex-shrink-0">
                 <div class="flex items-center space-x-2">
-                    <input type="file" id="user-file-input" class="hidden" accept="image/*,.xlsx,.xls,.pdf,.doc,.docx">
+                    <input type="file" id="user-file-input" class="hidden" accept="image/*,.pdf,.doc,.docx">
                     <button id="user-attach-btn" class="p-3 rounded-full hover:bg-gray-600/50 transition-colors">
                         <i data-lucide="paperclip" class="w-6 h-6"></i>
                     </button>
@@ -168,7 +130,7 @@
                 <div id="admin-chat-placeholder" class="flex flex-col h-full items-center justify-center text-gray-500 text-center p-4">
                     <i data-lucide="messages-square" class="w-24 h-24 mb-4 text-gray-600"></i>
                     <h3 class="text-lg font-semibold">Welcome, Admin</h3>
-                    <p>Select a conversation from the left to start chatting.</p>
+                    <p>Select a conversation to start chatting.</p>
                 </div>
                 <div id="admin-chat-area" class="h-full flex-col hidden">
                     <header class="header flex items-center p-4 flex-shrink-0 gap-3">
@@ -189,14 +151,13 @@
     
     <script type="module">
         // =================================================================================
-        // ধাপ ১: আপনার অ্যাডমিন User ID এখানে বসান
-        //==================================================================================
-        const ADMIN_UID = "YDO3DlSwk1UEPMFRAQEnjDM2qy62"; 
+        // ধাপ ১: আপনার তথ্য এখানে কনফিগার করুন
+        // =================================================================================
+        const ADMIN_TELEGRAM_ID = "6954647230"; // আপনার অ্যাডমিনের টেলিগ্রাম আইডি (string হিসাবে) এখানে দিন
+        const GET_CUSTOM_TOKEN_URL = "6415093983"; // আপনার ক্লাউড ফাংশনের URL এখানে দিন
 
-        // =================================================================================
-        // ধাপ ২: আপনার নিজের Firebase কনফিগারেশন এখানে পেস্ট করুন
-        // =================================================================================
         const firebaseConfig = {
+            // আপনার Firebase কনফিগারেশন এখানে পেস্ট করুন
             apiKey: "AIzaSyApc8_tOZSoOvIISX65kc-wr2RrV3nEgJE",
             authDomain: "admin-1feb9.firebaseapp.com",
             databaseURL: "https://admin-1feb9-default-rtdb.firebaseio.com",
@@ -210,8 +171,8 @@
         // মূল কোড শুরু
         // =================================================================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, serverTimestamp, query, orderBy, onSnapshot, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
         const app = initializeApp(firebaseConfig);
@@ -221,25 +182,29 @@
 
         let currentUser = null, userData = null, activeChatListener = null, selectedUserId = null;
         let adminStatusListener = null, isAdminOnline = false, adminHeartbeatInterval = null;
+        let telegramUser = null;
         
         const loader = document.getElementById('loader');
         const colorPalette = ["#ef4444", "#f97316", "#84cc16", "#22c55e", "#14b8a6", "#06b6d4", "#3b82f6", "#8b5cf6", "#d946ef", "#ec4899"];
 
         window.onload = () => {
-            try { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); } 
-            catch (e) { console.warn("Telegram WebApp script not found."); }
             lucide.createIcons();
             setupEventListeners();
-            loader.style.display = 'flex';
-
-            // নতুন পরিবর্তন: যদি ADMIN_UID না থাকে তাহলে অ্যাডমিন লগইন ফর্ম 숨기기
-            if (!ADMIN_UID) {
-                document.getElementById('auth-container').style.display = 'none';
-                const separator = document.querySelector('#auth-section .flex.items-center.my-4');
-                if (separator) separator.style.display = 'none';
-            }
             
-            onAuthStateChanged(auth, handleAuthStateChange);
+            try {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                
+                if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+                    telegramUser = Telegram.WebApp.initDataUnsafe.user;
+                    onAuthStateChanged(auth, handleAuthStateChange);
+                } else {
+                    handleAuthError("Could not retrieve user data from Telegram.");
+                }
+            } catch (e) {
+                console.error("Telegram WebApp script error:", e);
+                handleAuthError("Please open this app inside Telegram.");
+            }
         };
 
         async function handleAuthStateChange(user) {
@@ -252,61 +217,64 @@
                 await fetchUserData();
                 showMainPage('app-container');
 
-                if (user.uid === ADMIN_UID) {
+                if (user.uid === ADMIN_TELEGRAM_ID) {
                     initializeAppAdmin();
                 } else {
                     initializeAppUser();
                 }
             } else {
-                // নতুন পরিবর্তন: এখানে মূল লজিকটি পরিবর্তন করা হয়েছে
-                if (ADMIN_UID) {
-                    // আগের মতো অ্যাডমিন আইডি সেট করা থাকলে, লগইন পেজ দেখানো হবে
-                    showMainPage('auth-section');
-                    loader.style.display = 'none';
-                } else {
-                    // অ্যাডমিন আইডি সেট করা না থাকলে, সরাসরি গেস্ট হিসেবে লগইন করানো হবে
-                    // ব্যবহারকারী কোনো লগইন পেজ দেখবে না
-                    signInAnonymously(auth).catch(error => {
-                        console.error("Auto anonymous sign-in failed: ", error);
-                        alert("Could not start chat automatically. Please refresh.");
-                        loader.style.display = 'none';
-                    });
+                authenticateWithTelegram();
+            }
+        }
+
+        async function authenticateWithTelegram() {
+            try {
+                if (GET_CUSTOM_TOKEN_URL === "YOUR_CLOUD_FUNCTION_URL_HERE") {
+                   return handleAuthError("Backend function URL is not configured.");
                 }
+                const response = await fetch(GET_CUSTOM_TOKEN_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ initData: Telegram.WebApp.initData })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Failed to get custom token: ${errorText}`);
+                }
+                
+                const result = await response.json();
+                await signInWithCustomToken(auth, result.token);
+            } catch (error) {
+                console.error("Custom authentication failed:", error);
+                handleAuthError("Authentication failed. Please try reloading the app.");
             }
         }
 
         async function fetchUserData() {
-            if (!currentUser) return;
+            if (!currentUser || !telegramUser) return;
             const userRef = doc(db, "users", currentUser.uid);
             const userSnap = await getDoc(userRef);
 
             if (!userSnap.exists()) {
-                let name = currentUser.isAnonymous ? `Guest-${currentUser.uid.substring(0, 5)}` : (currentUser.email ? currentUser.email.split('@')[0] : 'Admin');
-                const defaultData = { name: name, email: currentUser.email, photoURL: null };
+                const name = `${telegramUser.first_name || ''} ${telegramUser.last_name || ''}`.trim() || telegramUser.username || `User-${telegramUser.id}`;
+                const defaultData = { name: name, telegramId: telegramUser.id, username: telegramUser.username, photoURL: null };
                 await setDoc(userRef, defaultData); 
                 userData = defaultData;
             } else { 
                 userData = userSnap.data(); 
             }
-            if (!currentUser.isAnonymous) return;
             updateUserProfileUI();
         }
 
         function updateUserProfileUI() {
             if (!userData) return;
             const profilePicEl = document.getElementById('user-profile-pic');
-            const nameToUse = userData.name || 'G';
+            const nameToUse = userData.name || (telegramUser ? telegramUser.first_name : 'U');
             profilePicEl.src = userData.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(nameToUse.charAt(0))}&background=random&color=fff`;
         }
         
         function initializeAppUser() {
-            // নতুন পরিবর্তন: গেস্ট হলে লগআউট বাটন লুকানো হবে
-            if (currentUser && currentUser.isAnonymous) {
-                document.getElementById('logout-btn-user').style.display = 'none';
-            } else {
-                document.getElementById('logout-btn-user').style.display = 'block';
-            }
-
             document.getElementById('admin-panel-view').classList.add('hidden');
             document.getElementById('user-chat-view').classList.remove('hidden');
             document.getElementById('user-chat-view').classList.add('flex');
@@ -316,14 +284,10 @@
         }
 
         function listenForAdminStatus() {
-            if (!ADMIN_UID) {
-                // ADMIN_UID না থাকলে স্ট্যাটাস দেখানোর প্রয়োজন নেই
-                document.getElementById('admin-status').style.display = 'none';
-                return;
-            };
+            if (!ADMIN_TELEGRAM_ID) return;
             if (adminStatusListener) adminStatusListener();
             
-            const statusRef = doc(db, 'admin_status', ADMIN_UID);
+            const statusRef = doc(db, 'admin_status', ADMIN_TELEGRAM_ID);
             const statusEl = document.getElementById('admin-status');
             statusEl.innerHTML = '<span class="text-yellow-500">●</span> Connecting...';
 
@@ -331,13 +295,10 @@
                 if (docSnap.exists() && docSnap.data().lastSeen) {
                     const lastSeen = docSnap.data().lastSeen.toDate();
                     const diffMinutes = (new Date() - lastSeen) / (1000 * 60);
-                    if (diffMinutes < 2) {
-                        isAdminOnline = true;
-                        statusEl.innerHTML = '<span class="text-green-400">●</span> Online';
-                    } else {
-                        isAdminOnline = false;
-                        statusEl.innerHTML = '<span class="text-gray-500">●</span> Offline';
-                    }
+                    isAdminOnline = diffMinutes < 2;
+                    statusEl.innerHTML = isAdminOnline 
+                        ? '<span class="text-green-400">●</span> Online' 
+                        : '<span class="text-gray-500">●</span> Offline';
                 } else {
                     isAdminOnline = false;
                     statusEl.innerHTML = '<span class="text-gray-500">●</span> Offline';
@@ -371,7 +332,7 @@
 
         function setupAdminHeartbeat() {
             if (adminHeartbeatInterval) clearInterval(adminHeartbeatInterval);
-            const statusRef = doc(db, 'admin_status', ADMIN_UID);
+            const statusRef = doc(db, 'admin_status', ADMIN_TELEGRAM_ID);
             const updateStatus = () => setDoc(statusRef, { lastSeen: serverTimestamp() });
             
             updateStatus();
@@ -526,21 +487,8 @@
         }
 
         function setupEventListeners() {
-            [ 'logout-btn-user', 'logout-btn-admin' ].forEach(id => document.getElementById(id).addEventListener('click', () => signOut(auth)));
+            document.getElementById('logout-btn-admin').addEventListener('click', () => signOut(auth));
             
-            document.getElementById('login-btn').addEventListener('click', handleLogin);
-            
-            document.getElementById('guest-login-btn').addEventListener('click', async () => {
-                loader.style.display = 'flex';
-                try {
-                    await signInAnonymously(auth);
-                } catch(error) {
-                    console.error("Anonymous sign-in failed: ", error);
-                    alert("Could not start chat session. Please refresh the page.");
-                    loader.style.display = 'none';
-                }
-            });
-
             document.getElementById('user-profile-pic-wrapper').addEventListener('click', () => document.getElementById('profile-pic-input').click());
             document.getElementById('profile-pic-input').addEventListener('change', (e) => {
                 if(e.target.files[0]) handleProfilePictureUpload(e.target.files[0]);
@@ -555,26 +503,21 @@
                 userInp.value = '';
                 await sendMessage({ text: text }, true);
                 
-                if (!isAdminOnline && ADMIN_UID) {
+                if (!isAdminOnline && ADMIN_TELEGRAM_ID) {
                     const chatRef = doc(db, 'support_chats', currentUser.uid);
-                    const messagesColRef = collection(db, `support_chats/${currentUser.uid}/messages`);
-                    
                     try {
                         await runTransaction(db, async (transaction) => {
                             const chatDoc = await transaction.get(chatRef);
-                            
                             if (!chatDoc.exists() || !chatDoc.data().autoReplySent) {
-                                const OFFLINE_MESSAGE_TEXT = "এখন আমাদের কাস্টমার প্রতিনিধি সবাই অফলাইনে আছে একটু সময় দিয়ে আমাদেরকে সাথেই থাকুন";
-                                const autoReplyData = { senderId: ADMIN_UID, text: OFFLINE_MESSAGE_TEXT, timestamp: serverTimestamp() };
+                                const OFFLINE_MESSAGE_TEXT = "এখন আমাদের প্রতিনিধি অফলাইনে আছেন। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।";
+                                const autoReplyData = { senderId: ADMIN_TELEGRAM_ID, text: OFFLINE_MESSAGE_TEXT, timestamp: serverTimestamp() };
                                 
-                                const newMsgRef = doc(messagesColRef);
+                                const newMsgRef = doc(collection(db, `support_chats/${currentUser.uid}/messages`));
                                 transaction.set(newMsgRef, autoReplyData);
                                 transaction.set(chatRef, { autoReplySent: true }, { merge: true });
                             }
                         });
-                    } catch (e) {
-                        console.error("Transaction failed: ", e);
-                    }
+                    } catch (e) { console.error("Auto-reply transaction failed: ", e); }
                 }
             };
             userSendBtn.addEventListener('click', userSend);
@@ -594,23 +537,15 @@
             adminSendBtn.addEventListener('click', adminSend);
             adminInp.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); adminSend(); } });
         }
-
-        async function handleLogin() {
-            const email = document.getElementById('login-email').value, pass = document.getElementById('login-password').value;
-            if (!email || !pass) return alert("Please enter email and password.");
-            loader.style.display = 'flex';
-            try { 
-                const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-                if (userCredential.user.uid !== ADMIN_UID) {
-                    await signOut(auth);
-                    alert("Login Failed: This is not an admin account.");
-                    loader.style.display = 'none';
-                }
-            } 
-            catch (error) { 
-                alert("Login failed: " + error.message); 
-                loader.style.display = 'none';
-            }
+        
+        function handleAuthError(message) {
+            document.body.innerHTML = `<div class="flex flex-col items-center justify-center h-screen text-center p-4 text-red-400">
+                <i data-lucide="alert-triangle" class="w-16 h-16 mb-4"></i>
+                <h2 class="text-xl font-bold mb-2">Authentication Error</h2>
+                <p>${message}</p>
+            </div>`;
+            lucide.createIcons();
+            loader.style.display = 'none';
         }
 
         function showMainPage(pageId) {
