@@ -1,89 +1,71 @@
-<!doctype html>
-
-<html lang="bn">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Adexora Ads Demo</title>
-  <style>
-    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans','Helvetica Neue',Arial}
-    body{margin:0;background:#f6f7fb;color:#111;display:flex;align-items:center;justify-content:center;height:100vh}
-    .card{width:min(820px,95%);background:#fff;padding:24px;border-radius:12px;box-shadow:0 6px 20px rgba(20,20,40,0.08)}
-    h1{margin:0 0 8px;font-size:20px}
-    p{margin:0 0 16px;color:#555}
-    .ad-area{min-height:120px;border:2px dashed #e2e6f0;border-radius:8px;display:flex;align-items:center;justify-content:center}
-    .controls{margin-top:14px;display:flex;gap:8px}
-    button{padding:8px 12px;border-radius:8px;border:0;background:#1f7aea;color:white;cursor:pointer}
-    button.secondary{background:#6b7280}
-    pre{background:#f3f4f6;padding:12px;border-radius:8px;overflow:auto}
-    .note{margin-top:12px;color:#666;font-size:13px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adexora Ad Test</title>
+    
+    <script src="https://adexora.com/cdn/ads.js?id=648"></script>
+    
+    <style>
+        /* পেজটিকে একটু সুন্দর দেখানোর জন্য এই স্টাইল যোগ করা হলো (ঐচ্ছিক) */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #333;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Adexora Ads — ডেমো</h1>
-    <p>নীচে থাকা বক্সেই Adexora বিজ্ঞাপন লোড হবে।</p><!-- Ad container: Adexora স্ক্রিপ্ট এখানে AD DOM এ ইনসার্ট করবে -->
-<div id="adexora-ad-slot" class="ad-area" aria-live="polite">
-  বিজ্ঞাপন লোড করা হচ্ছে...
-</div>
 
-<div class="controls">
-  <button id="loadAdBtn">এখনই বিজ্ঞাপন লোড করুন</button>
-  <button id="reloadBtn" class="secondary">রিলোড</button>
-</div>
+    <h1>Adexora অ্যাড লোডিং টেস্ট</h1>
+    
+    <div id="status">অ্যাড লোড করার চেষ্টা করা হচ্ছে...</div>
 
-<div class="note">নোট: ব্যবহার করার আগে নিশ্চিত করুন যে আপনি সাইটে HTTPS চালু করেছেন এবং provided <code>id=648</code> ঠিক আছে।</div>
+    <script>
+        // ধাপ ২: অ্যাড দেখানোর ফাংশনটি কল করা।
+        // স্ক্রিপ্টটি <body> ট্যাগের শেষে রাখা ভালো যাতে পুরো পেজটি আগে লোড হয়।
 
-<hr style="margin:16px 0" />
+        // অ্যাড দেখানোর চেষ্টা করা হচ্ছে
+        window.showAdexora()
+            .then(() => {
+                // যখন অ্যাড সফলভাবে লোড হবে
+                console.log("অ্যাড সফলভাবে দেখানো হয়েছে।");
+                document.getElementById("status").textContent = "✅ অ্যাড সফলভাবে দেখানো হয়েছে।";
+                document.getElementById("status").className = "success";
+                
+                // ✅ এখানে আপনার রিওয়ার্ড বা অন্য কোনো লজিক যোগ করুন
+            })
+            .catch(e => {
+                // যখন কোনো কারণে অ্যাড লোড হতে ব্যর্থ হবে
+                console.error("অ্যাড দেখাতে সমস্যা হয়েছে:", e);
+                document.getElementById("status").textContent = "❌ অ্যাড দেখাতে সমস্যা হয়েছে। (বিস্তারিত দেখতে কনসোল চেক করুন)";
+                document.getElementById("status").className = "error";
+                
+                // ❌ এখানে অ্যাড লোড না হলে কী হবে, সেই লজিক যোগ করুন
+            });
+    </script>
 
-<h2 style="font-size:16px;margin-bottom:8px">কোড (আপনার রেফারেন্স)</h2>
-<pre>&lt;script src="https://adexora.com/cdn/ads.js?id=648"&gt;&lt;/script&gt;
-
-window.showAdexora() .then(() => { // ✅ Your reward logic here }) .catch(e => { // ❌ Handle errors here });</pre>
-
-  </div>  <!-- Adexora CDN স্ক্রিপ্ট -->  <script src="https://adexora.com/cdn/ads.js?id=648" async></script>  <script>
-    // সহজ, নিরাপদ wrapper — DOM প্রস্তুত হলে বা বাটন ক্লিক করলে বিজ্ঞাপন লোড করবে
-    const adSlot = document.getElementById('adexora-ad-slot');
-    const loadBtn = document.getElementById('loadAdBtn');
-    const reloadBtn = document.getElementById('reloadBtn');
-
-    function showMessage(msg){
-      adSlot.textContent = msg;
-    }
-
-    async function loadAd(){
-      showMessage('Adexora-তে অনুরোধ পাঠানো হচ্ছে...');
-
-      if (!window.showAdexora || typeof window.showAdexora !== 'function'){
-        showMessage('Adexora স্ক্রিপ্ট পাওয়া যায়নি। স্ক্রিপ্ট URL ঠিক আছে কিনা দেখুন।');
-        return;
-      }
-
-      try{
-        await window.showAdexora();
-        // যদি Adexora DOM-এ ইন্সার্ট করে, তখন এখানে কাস্টম লজিক চালাতে পারেন
-        // উদাহরণ: রিওয়ার্ড-লজিক বা কাস্টম এনালিটিক্স কল
-        // ✅ আপনার reward logic এখানে রাখুন
-
-        // যদি Adexora নিজে কিছু DOM যোগ করে না, আপনি চাইলে নিচে কাস্টম placeholder যোগ করতে পারেন
-        if (!adSlot.querySelector('*')){
-          adSlot.innerHTML = '<div style="padding:16px;text-align:center">বিজ্ঞাপন সফলভাবে লোড হয়েছে — কিন্তু Adexora কোন অ্যাড DOM পাঠায়নি।</div>';
-        }
-      }catch(err){
-        console.error('Adexora load error:', err);
-        showMessage('বিজ্ঞাপন লোড করতে সমস্যা হয়েছে — কনসোলে ত্রুটি দেখুন।');
-      }
-    }
-
-    // ইউজার ক্লিক বা প্রথম ভিউ-এ লোড করা — এখানে আমরা ক্লিক-ট্রিগার ব্যবহার করেছি
-    loadBtn.addEventListener('click', loadAd);
-    reloadBtn.addEventListener('click', ()=>{
-      // স্বচ্ছতার জন্য প্রথমে খালি করে পুনরায় লোড
-      adSlot.innerHTML = 'বিজ্ঞাপন রিলোড করা হচ্ছে...';
-      loadAd();
-    });
-
-    // ঐচ্ছিক: পেজ লোডের সঙ্গে স্বয়ংক্রিয় লোড
-    // window.addEventListener('DOMContentLoaded', loadAd);
-  </script></body>
+</body>
 </html>
