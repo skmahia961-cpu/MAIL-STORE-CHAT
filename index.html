@@ -1,260 +1,89 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Support Chat</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        :root { --bg-primary: #121212; --bg-secondary: #1E1E1E; --border-color: rgba(255, 255, 255, 0.1); --text-primary: #FFFFFF; --text-secondary: #A0A0A0; --accent-end: #4682B4; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); }
-        .main-page.active { display: flex; } .main-page { display: none; }
-        .btn-gradient { background-image: linear-gradient(to right, #4682B4, #5A9BD5); color: var(--text-primary); font-weight: bold; }
-        .input-field { background-color: #2C2C2C; border: 1px solid #444; }
-        .header { border-bottom: 1px solid var(--border-color); background-color: rgba(18, 18, 18, 0.8); backdrop-filter: blur(10px); }
-        .chat-bubble { max-width: 80%; padding: 10px 15px; border-radius: 20px; word-wrap: break-word; }
-        .chat-bubble-incoming { background-color: #262626; align-self: flex-start; }
-        .chat-bubble-outgoing { background-color: var(--accent-end); color: var(--text-primary); align-self: flex-end; }
-        .admin-user-item.active { background-color: rgba(70, 130, 180, 0.2); }
-        .unread-badge { background-color: #ef4444; color: white; font-size: 0.75rem; font-weight: bold; padding: 2px 6px; border-radius: 9999px; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Adexora Ads Demo</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans','Helvetica Neue',Arial}
+    body{margin:0;background:#f6f7fb;color:#111;display:flex;align-items:center;justify-content:center;height:100vh}
+    .card{width:min(820px,95%);background:#fff;padding:24px;border-radius:12px;box-shadow:0 6px 20px rgba(20,20,40,0.08)}
+    h1{margin:0 0 8px;font-size:20px}
+    p{margin:0 0 16px;color:#555}
+    .ad-area{min-height:120px;border:2px dashed #e2e6f0;border-radius:8px;display:flex;align-items:center;justify-content:center}
+    .controls{margin-top:14px;display:flex;gap:8px}
+    button{padding:8px 12px;border-radius:8px;border:0;background:#1f7aea;color:white;cursor:pointer}
+    button.secondary{background:#6b7280}
+    pre{background:#f3f4f6;padding:12px;border-radius:8px;overflow:auto}
+    .note{margin-top:12px;color:#666;font-size:13px}
+  </style>
 </head>
-<body class="max-w-md mx-auto h-screen overflow-hidden">
+<body>
+  <div class="card">
+    <h1>Adexora Ads — ডেমো</h1>
+    <p>নীচে থাকা বক্সেই Adexora বিজ্ঞাপন লোড হবে।</p><!-- Ad container: Adexora স্ক্রিপ্ট এখানে AD DOM এ ইনসার্ট করবে -->
+<div id="adexora-ad-slot" class="ad-area" aria-live="polite">
+  বিজ্ঞাপন লোড করা হচ্ছে...
+</div>
 
-    <div id="loader" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#4682B4]"></div>
-    </div>
+<div class="controls">
+  <button id="loadAdBtn">এখনই বিজ্ঞাপন লোড করুন</button>
+  <button id="reloadBtn" class="secondary">রিলোড</button>
+</div>
 
-    <div id="app-container" class="h-full flex-col main-page">
-        <!-- User Chat View -->
-        <div id="user-chat-view" class="h-full flex-col hidden w-full">
-            <header class="header flex items-center justify-between p-4 flex-shrink-0">
-                <h1 class="text-xl font-bold">Support Chat</h1>
-                <span id="admin-status" class="ml-2 text-sm font-medium"></span>
-            </header>
-            <main id="chat-messages" class="flex-grow p-4 flex flex-col space-y-4 overflow-y-auto"></main>
-            <footer class="p-4 flex-shrink-0 border-t border-border-color">
-                <div class="flex items-center space-x-2">
-                    <input id="user-message-input" type="text" placeholder="Type your message..." class="flex-grow w-full p-3 rounded-full input-field">
-                    <button id="user-send-btn" class="btn-gradient p-3 rounded-full flex-shrink-0"><i data-lucide="send" class="w-6 h-6"></i></button>
-                </div>
-            </footer>
-        </div>
+<div class="note">নোট: ব্যবহার করার আগে নিশ্চিত করুন যে আপনি সাইটে HTTPS চালু করেছেন এবং provided <code>id=648</code> ঠিক আছে।</div>
 
-        <!-- Admin Panel View -->
-        <div id="admin-panel-view" class="h-full flex hidden w-full bg-bg-secondary">
-            <div class="w-2/5 border-r border-border-color flex flex-col h-full">
-                <header class="header p-4"><h2 class="font-bold text-lg">Chats</h2></header>
-                <div id="admin-user-list" class="overflow-y-auto flex-grow"></div>
-            </div>
-            <div id="admin-chat-window" class="w-3/5 flex flex-col h-full">
-                <div id="admin-chat-placeholder" class="flex flex-col h-full items-center justify-center p-4 text-center">
-                    <i data-lucide="messages-square" class="w-24 h-24 mb-4 text-gray-600"></i>
-                    <h3 class="text-lg font-semibold">Welcome, Admin</h3><p>Select a chat to start.</p>
-                </div>
-                <div id="admin-chat-area" class="h-full flex-col hidden">
-                    <header id="admin-chat-header-container" class="header flex items-center p-4 gap-3"></header>
-                    <main id="admin-chat-messages" class="flex-grow p-4 flex flex-col space-y-4 overflow-y-auto"></main>
-                    <footer class="p-4 border-t border-border-color">
-                        <div class="flex items-center space-x-2">
-                            <input id="admin-message-input" type="text" placeholder="Type your reply..." class="flex-grow p-3 rounded-full input-field">
-                            <button id="admin-send-btn" class="btn-gradient p-3 rounded-full"><i data-lucide="send" class="w-6 h-6"></i></button>
-                        </div>
-                    </footer>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <script type="module">
-        // =================================================================================
-        // শুরু করুন: আপনার তথ্য এখানে বসান
-        // =================================================================================
+<hr style="margin:16px 0" />
 
-        // ১. আপনার অ্যাডমিনের টেলিগ্রাম আইডি এখানে দিন
-        const ADMIN_TELEGRAM_ID = "7358825471";
+<h2 style="font-size:16px;margin-bottom:8px">কোড (আপনার রেফারেন্স)</h2>
+<pre>&lt;script src="https://adexora.com/cdn/ads.js?id=648"&gt;&lt;/script&gt;
 
-        // ২. <<<<< সবচেয়ে গুরুত্বপূর্ণ: ধাপ ১ থেকে পাওয়া Function URL টি এখানে পেস্ট করুন >>>>>
-        const GET_CUSTOM_TOKEN_URL = "এখানে_আপনার_ফাংশনের_URL_দিন"; 
+window.showAdexora() .then(() => { // ✅ Your reward logic here }) .catch(e => { // ❌ Handle errors here });</pre>
 
-        // ৩. আপনার Firebase প্রজেক্টের কনফিগারেশন এখানে পেস্ট করুন
-        const firebaseConfig = {
-            apiKey: "AIzaSy...",
-            authDomain: "...",
-            databaseURL: "https://...",
-            projectId: "...",
-            storageBucket: "...",
-            messagingSenderId: "...",
-            appId: "..."
-        };
-        
-        // =================================================================================
-        // মূল কোড (এখানে কিছু পরিবর্তন করার দরকার নেই)
-        // =================================================================================
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, serverTimestamp, query, orderBy, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        let currentUser, activeChatListener, selectedUserId, telegramUser;
-        const loader = document.getElementById('loader');
+  </div>  <!-- Adexora CDN স্ক্রিপ্ট -->  <script src="https://adexora.com/cdn/ads.js?id=648" async></script>  <script>
+    // সহজ, নিরাপদ wrapper — DOM প্রস্তুত হলে বা বাটন ক্লিক করলে বিজ্ঞাপন লোড করবে
+    const adSlot = document.getElementById('adexora-ad-slot');
+    const loadBtn = document.getElementById('loadAdBtn');
+    const reloadBtn = document.getElementById('reloadBtn');
 
-        window.onload = () => {
-            lucide.createIcons();
-            setupEventListeners();
-            try {
-                Telegram.WebApp.ready(); Telegram.WebApp.expand();
-                telegramUser = Telegram.WebApp.initDataUnsafe?.user;
-                if (telegramUser) onAuthStateChanged(auth, handleAuthStateChange);
-                else handleAuthError("Telegram user data not found.");
-            } catch (e) { handleAuthError("Please open this app inside Telegram."); }
-        };
+    function showMessage(msg){
+      adSlot.textContent = msg;
+    }
 
-        async function handleAuthStateChange(user) {
-            if (activeChatListener) activeChatListener(); 
-            if (user) {
-                currentUser = user;
-                await setupUser();
-                document.getElementById('app-container').classList.add('active');
-                if (user.uid === ADMIN_TELEGRAM_ID) initializeAppAdmin();
-                else initializeAppUser();
-            } else { authenticateWithTelegram(); }
+    async function loadAd(){
+      showMessage('Adexora-তে অনুরোধ পাঠানো হচ্ছে...');
+
+      if (!window.showAdexora || typeof window.showAdexora !== 'function'){
+        showMessage('Adexora স্ক্রিপ্ট পাওয়া যায়নি। স্ক্রিপ্ট URL ঠিক আছে কিনা দেখুন।');
+        return;
+      }
+
+      try{
+        await window.showAdexora();
+        // যদি Adexora DOM-এ ইন্সার্ট করে, তখন এখানে কাস্টম লজিক চালাতে পারেন
+        // উদাহরণ: রিওয়ার্ড-লজিক বা কাস্টম এনালিটিক্স কল
+        // ✅ আপনার reward logic এখানে রাখুন
+
+        // যদি Adexora নিজে কিছু DOM যোগ করে না, আপনি চাইলে নিচে কাস্টম placeholder যোগ করতে পারেন
+        if (!adSlot.querySelector('*')){
+          adSlot.innerHTML = '<div style="padding:16px;text-align:center">বিজ্ঞাপন সফলভাবে লোড হয়েছে — কিন্তু Adexora কোন অ্যাড DOM পাঠায়নি।</div>';
         }
+      }catch(err){
+        console.error('Adexora load error:', err);
+        showMessage('বিজ্ঞাপন লোড করতে সমস্যা হয়েছে — কনসোলে ত্রুটি দেখুন।');
+      }
+    }
 
-        async function authenticateWithTelegram() {
-            if (GET_CUSTOM_TOKEN_URL === "এখানে_আপনার_ফাংশশনের_URL_দিন") 
-                return handleAuthError("Backend function URL is not configured. Please paste the URL in the HTML file.");
-            try {
-                const res = await fetch(GET_CUSTOM_TOKEN_URL, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ initData: Telegram.WebApp.initData })
-                });
-                if (!res.ok) throw new Error(await res.text());
-                const { token } = await res.json();
-                await signInWithCustomToken(auth, token);
-            } catch (error) { handleAuthError("Authentication failed. Please reload."); }
-        }
+    // ইউজার ক্লিক বা প্রথম ভিউ-এ লোড করা — এখানে আমরা ক্লিক-ট্রিগার ব্যবহার করেছি
+    loadBtn.addEventListener('click', loadAd);
+    reloadBtn.addEventListener('click', ()=>{
+      // স্বচ্ছতার জন্য প্রথমে খালি করে পুনরায় লোড
+      adSlot.innerHTML = 'বিজ্ঞাপন রিলোড করা হচ্ছে...';
+      loadAd();
+    });
 
-        async function setupUser() {
-            const userRef = doc(db, "users", currentUser.uid);
-            const userSnap = await getDoc(userRef);
-            if (!userSnap.exists()) {
-                const name = `${telegramUser.first_name || ''} ${telegramUser.last_name || ''}`.trim() || telegramUser.username;
-                await setDoc(userRef, { name, telegramId: telegramUser.id }); 
-            }
-        }
-        
-        function initializeAppUser() {
-            document.getElementById('admin-panel-view').style.display = 'none';
-            document.getElementById('user-chat-view').style.display = 'flex';
-            loadUserChat();
-            listenForAdminStatus();
-            loader.style.display = 'none';
-        }
-
-        function listenForAdminStatus() {
-            const statusEl = document.getElementById('admin-status');
-            onSnapshot(doc(db, 'admin_status', ADMIN_TELEGRAM_ID), (docSnap) => {
-                const online = docSnap.exists() && (new Date() - docSnap.data().lastSeen.toDate()) < 120000;
-                statusEl.innerHTML = `● ${online ? 'Online' : 'Offline'}`;
-                statusEl.className = `text-sm font-medium ${online ? 'text-green-400' : 'text-gray-500'}`;
-            });
-        }
-
-        function loadUserChat() {
-            const container = document.getElementById('chat-messages');
-            const q = query(collection(db, `support_chats/${currentUser.uid}/messages`), orderBy("timestamp"));
-            activeChatListener = onSnapshot(q, snap => {
-                container.innerHTML = '';
-                snap.forEach(doc => displayMessage(doc.data(), container));
-                container.scrollTop = container.scrollHeight;
-            });
-        }
-        
-        function initializeAppAdmin() {
-            document.getElementById('user-chat-view').style.display = 'none';
-            document.getElementById('admin-panel-view').style.display = 'flex';
-            loadAdminUserList();
-            const update = () => setDoc(doc(db, 'admin_status', ADMIN_TELEGRAM_ID), { lastSeen: serverTimestamp() });
-            update(); setInterval(update, 60000);
-            loader.style.display = 'none';
-        }
-        
-        function loadAdminUserList() {
-            const container = document.getElementById('admin-user-list');
-            const q = query(collection(db, 'support_chats'), orderBy('lastUpdate', 'desc'));
-            onSnapshot(q, snap => {
-                container.innerHTML = snap.empty ? '<p class="p-4 text-gray-500">No chats yet.</p>' : '';
-                snap.forEach(async docSnap => {
-                    const chat = docSnap.data();
-                    const user = (await getDoc(doc(db, 'users', docSnap.id))).data();
-                    const el = document.createElement('div');
-                    el.className = `admin-user-item flex items-center justify-between gap-3 p-3 border-b border-border-color cursor-pointer ${selectedUserId === docSnap.id ? 'active' : ''}`;
-                    const unread = chat.unreadCount_admin > 0 ? `<span class="unread-badge">${chat.unreadCount_admin}</span>` : '';
-                    el.innerHTML = `<div class="flex-grow overflow-hidden"><p class="font-bold truncate">${user.name}</p><p class="text-sm text-text-secondary truncate">${chat.lastMessage||''}</p></div>${unread}`;
-                    el.onclick = (e) => loadAdminChatForUser(docSnap.id, user.name, e.currentTarget);
-                    container.appendChild(el);
-                });
-            });
-        }
-        
-        async function loadAdminChatForUser(userId, userName, element) {
-            selectedUserId = userId;
-            document.querySelectorAll('.admin-user-item').forEach(d => d.classList.remove('active'));
-            element.classList.add('active');
-            document.getElementById('admin-chat-placeholder').style.display = 'none';
-            document.getElementById('admin-chat-area').style.display = 'flex';
-            document.getElementById('admin-chat-header-container').innerHTML = `<h1 class="text-lg font-bold">${userName}</h1>`;
-            await updateDoc(doc(db, 'support_chats', userId), { unreadCount_admin: 0 });
-            const container = document.getElementById('admin-chat-messages');
-            const q = query(collection(db, `support_chats/${userId}/messages`), orderBy("timestamp"));
-            if (activeChatListener) activeChatListener();
-            activeChatListener = onSnapshot(q, snap => {
-                container.innerHTML = '';
-                snap.forEach(doc => displayMessage(doc.data(), container));
-                container.scrollTop = container.scrollHeight;
-            });
-        }
-
-        async function sendMessage(text, fromUser) {
-            text = text.trim(); if (!text) return;
-            const chatUID = fromUser ? currentUser.uid : selectedUserId;
-            if (!chatUID) return;
-            const user = (await getDoc(doc(db, "users", currentUser.uid))).data();
-            await addDoc(collection(db, `support_chats/${chatUID}/messages`), { senderId: currentUser.uid, text, timestamp: serverTimestamp() });
-            const meta = { lastMessage: text, lastUpdate: serverTimestamp() };
-            if (fromUser) meta.unreadCount_admin = increment(1);
-            await setDoc(doc(db, 'support_chats', chatUID), meta, { merge: true });
-        }
-
-        function displayMessage(msg, container) {
-            const isOutgoing = msg.senderId === currentUser.uid;
-            const bubble = document.createElement('div');
-            bubble.className = `chat-bubble ${isOutgoing ? 'chat-bubble-outgoing' : 'chat-bubble-incoming'}`;
-            bubble.innerHTML = `<p>${msg.text}</p><p class="text-xs mt-1 text-right text-gray-400">${msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : ''}</p>`;
-            container.appendChild(bubble);
-        }
-
-        function setupEventListeners() {
-            const userInp = document.getElementById('user-message-input'), adminInp = document.getElementById('admin-message-input');
-            const userSend = () => { sendMessage(userInp.value, true); userInp.value = ''; };
-            const adminSend = () => { sendMessage(adminInp.value, false); adminInp.value = ''; };
-            document.getElementById('user-send-btn').addEventListener('click', userSend);
-            userInp.addEventListener('keypress', e => { if (e.key === 'Enter') userSend(); });
-            document.getElementById('admin-send-btn').addEventListener('click', adminSend);
-            adminInp.addEventListener('keypress', e => { if (e.key === 'Enter') adminSend(); });
-        }
-        
-        function handleAuthError(message) {
-            document.body.innerHTML = `<div class="flex flex-col items-center justify-center h-screen p-4 text-center text-red-400"><i data-lucide="alert-triangle" class="w-16 h-16 mb-4"></i><h2 class="text-xl font-bold mb-2">Error</h2><p>${message}</p></div>`;
-            lucide.createIcons();
-            loader.style.display = 'none';
-        }
-    </script>
-</body>
+    // ঐচ্ছিক: পেজ লোডের সঙ্গে স্বয়ংক্রিয় লোড
+    // window.addEventListener('DOMContentLoaded', loadAd);
+  </script></body>
 </html>
